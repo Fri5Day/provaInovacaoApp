@@ -1,0 +1,28 @@
+.v-btn {
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  letter-spacing: 0.5px !important;
+  transition: all 0.3s ease !important;
+}
+
+.v-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.v-btn--variant-elevated {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.v-btn--variant-outlined {
+  border-width: 1.5px;
+}
+
+.v-text-field, .v-select {
+  transition: all 0.3s ease;
+}
+
+.v-text-field:hover, .v-select:hover {
+  transform: translateY(-1px);
+}

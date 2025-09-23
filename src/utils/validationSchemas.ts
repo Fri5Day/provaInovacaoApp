@@ -8,4 +8,11 @@ export const userSchema = object({
     .email('E-mail inválido')
     .required('E-mail é obrigatório')
     .label('E-mail'),
+  password: string()
+    .required('Senha é obrigatória')
+    .label('Senha'),
+  role: string()
+    .required('Cargo é obrigatório')
+    .label('Cargo')
 })
+
