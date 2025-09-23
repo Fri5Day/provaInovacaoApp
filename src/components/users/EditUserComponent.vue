@@ -10,20 +10,52 @@
           <v-card class="pa-4">
             <v-form @submit.prevent="submit">
               <v-card-title
-                >Adicionar usuario</v-card-title
+                >Editar Usuário</v-card-title
               >
               <v-text-field
                 v-model="nameModel"
                 :error-messages="errors.name"
-                label="Nome"
+                label="Nome completo"
+                variant="outlined"
+                prepend-inner-icon="mdi-account"
                 density="comfortable"
+                class="mb-3"
               />
 
               <v-text-field
                 v-model="emailModel"
                 :error-messages="errors.email"
                 label="E-mail"
+                variant="outlined"
+                prepend-inner-icon="mdi-email"
                 density="comfortable"
+                type="email"
+                class="mb-3"
+              />
+
+              <v-select
+                v-model="roleModel"
+                :error-messages="errors.role"
+                label="Perfil"
+                variant="outlined"
+                prepend-inner-icon="mdi-shield-account"
+                density="comfortable"
+                :items="[
+                  'Administrador',
+                  'Usuário',
+                ]"
+                class="mb-3"
+              />
+
+              <v-text-field
+                v-model="passwordModel"
+                :error-messages="errors.password"
+                label="Senha"
+                variant="outlined"
+                prepend-inner-icon="mdi-lock"
+                density="comfortable"
+                type="password"
+                class="mb-3"
               />
 
               <v-card-actions>
@@ -57,6 +89,8 @@ const props = defineProps<{
   dialog: boolean
   name: string
   email: string
+  password: string
+  role: string
   errors: { [key: string]: string[] }
 }>()
 
@@ -64,6 +98,8 @@ const emit = defineEmits([
   'update:dialog',
   'update:name',
   'update:email',
+  'update:password',
+  'update:role',
   'submit',
 ])
 
@@ -81,4 +117,23 @@ const emailModel = computed({
   get: () => props.email,
   set: (value) => emit('update:email', value),
 })
+
+const passwordModel = computed({
+  get: () => props.password,
+  set: (value) => emit('update:password', value),
+})
+
+const roleModel = computed({
+  get: () => props.role,
+  set: (value) => emit('update:role', value),
+})
+
+const submit = () => {
+  emit('submit', {
+    name: props.name,
+    email: props.email,
+    password: props.password,
+    role: props.role,
+  })
+}
 </script>

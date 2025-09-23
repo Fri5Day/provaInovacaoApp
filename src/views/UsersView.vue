@@ -104,6 +104,16 @@
       @save-user="handleCreateUser"
     />
 
+    <EditUserComponent
+      v-model:dialog="editDialog"
+      v-model:name="editUserData.name"
+      v-model:email="editUserData.email"
+      v-model:password="editUserData.password"
+      v-model:role="editUserData.role"
+      :errors="editErrors"
+      @submit="handleEditUser"
+    />
+
     <v-dialog
       v-model="deleteDialog"
       max-width="420"
@@ -179,6 +189,8 @@ import type { UserInterface } from '@/interface/users/usersInterface'
 import type { CreateUserInterface } from '@/interface/users/createUsersInterface'
 
 import CreateUserComponent from '@/components/users/CreateUserComponent.vue'
+import EditUserComponent from '@/components/users/EditUserComponent.vue'
+
 import {
   DotsVerticalIcon,
   EditIcon,
@@ -188,11 +200,21 @@ import {
 import { getUsers } from '@/api/users/getUsers'
 import { postUsers } from '@/api/users/postUsers'
 import { deleteUsers } from '@/api/users/deleteUsers'
+import { putUsers } from '@/api/users/putUsers'
 
 const users = ref<UserInterface[]>([])
 const dialog = ref(false)
 const deleteDialog = ref(false)
+const editDialog = ref(false)
 const userToDelete = ref<number | null>(null)
+const editUserData = ref({
+  id: 0,
+  name: '',
+  email: '',
+  password: '',
+  role: 'Usuário'
+})
+const editErrors = ref<{ [key: string]: string[] }>({})
 
 const headers = [
   { title: 'Nome', key: 'name' },
@@ -233,8 +255,27 @@ const loadUsers = async () => {
 }
 
 const editUser = (id: number) => {
-  console.log('Editando usuário:', id)
-  // Implementar navegação para edição quando criar a página
+  const user = users.value.find(u => u.id === id)
+  if (user) {
+    editUserData.value = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      password: user.password,
+      role: user.role
+    }
+    editDialog.value = true
+  }
+}
+
+const handleEditUser = async (userData: CreateUserInterface) => {
+  try {
+    await putUsers(editUserData.value.id, userData)
+    await loadUsers()
+    editDialog.value = false
+  } catch (error) {
+    console.error(error)
+  }
 }
 
 const deleteUser = (id: number) => {
