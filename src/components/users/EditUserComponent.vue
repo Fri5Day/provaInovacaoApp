@@ -1,85 +1,105 @@
 <template>
-  <v-container class="mt-15">
-    <v-row justify="center" align="center">
-      <v-col cols="12" sm="8" md="6" lg="4">
-        <v-dialog
-          v-model="isOpen"
-          max-width="600px"
-          persistent
+  <v-dialog
+    v-model="isOpen"
+    max-width="520"
+    persistent
+    class="edit-user-dialog"
+  >
+    <v-card class="edit-user-card" elevation="12">
+      <div class="dialog-header pa-6 pb-4">
+        <div class="d-flex align-center">
+          <v-avatar color="primary" size="48" class="mr-4">
+            <v-icon color="white" size="24">mdi-account-edit</v-icon>
+          </v-avatar>
+          <div>
+            <h2 class="text-h5 font-weight-bold text-primary mb-1">
+              Editar Usuário
+            </h2>
+            <p class="text-body-2 text-medium-emphasis ma-0">
+              Atualize os dados do usuário
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <v-divider class="mx-6" />
+
+      <v-card-text class="pa-6">
+        <v-form class="form-container" @submit.prevent="submit">
+          <v-text-field
+            v-model="nameModel"
+            :error-messages="errors.name"
+            label="Nome completo"
+            variant="outlined"
+            prepend-inner-icon="mdi-account"
+            density="comfortable"
+            class="mb-3"
+            hide-details="auto"
+          />
+
+          <v-text-field
+            v-model="emailModel"
+            :error-messages="errors.email"
+            label="E-mail"
+            variant="outlined"
+            prepend-inner-icon="mdi-email"
+            density="comfortable"
+            type="email"
+            class="mb-3"
+            hide-details="auto"
+          />
+
+          <v-select
+            v-model="roleModel"
+            :error-messages="errors.role"
+            label="Perfil"
+            variant="outlined"
+            prepend-inner-icon="mdi-shield-account"
+            density="comfortable"
+            :items="['Administrador', 'Usuário']"
+            class="mb-3"
+            hide-details="auto"
+          />
+
+          <v-text-field
+            v-model="passwordModel"
+            :error-messages="errors.password"
+            label="Senha"
+            variant="outlined"
+            prepend-inner-icon="mdi-lock"
+            density="comfortable"
+            type="password"
+            class="mb-3"
+            hide-details="auto"
+          />
+
+        </v-form>
+      </v-card-text>
+
+      <v-card-actions class="pa-6 pt-0">
+        <v-spacer />
+        <v-btn
+          variant="outlined"
+          color="grey"
+          class="mr-3"
+          @click="isOpen = false"
         >
-          <v-card class="pa-4">
-            <v-form @submit.prevent="submit">
-              <v-card-title
-                >Editar Usuário</v-card-title
-              >
-              <v-text-field
-                v-model="nameModel"
-                :error-messages="errors.name"
-                label="Nome completo"
-                variant="outlined"
-                prepend-inner-icon="mdi-account"
-                density="comfortable"
-                class="mb-3"
-              />
-
-              <v-text-field
-                v-model="emailModel"
-                :error-messages="errors.email"
-                label="E-mail"
-                variant="outlined"
-                prepend-inner-icon="mdi-email"
-                density="comfortable"
-                type="email"
-                class="mb-3"
-              />
-
-              <v-select
-                v-model="roleModel"
-                :error-messages="errors.role"
-                label="Perfil"
-                variant="outlined"
-                prepend-inner-icon="mdi-shield-account"
-                density="comfortable"
-                :items="[
-                  'Administrador',
-                  'Usuário',
-                ]"
-                class="mb-3"
-              />
-
-              <v-text-field
-                v-model="passwordModel"
-                :error-messages="errors.password"
-                label="Senha"
-                variant="outlined"
-                prepend-inner-icon="mdi-lock"
-                density="comfortable"
-                type="password"
-                class="mb-3"
-              />
-
-              <v-card-actions>
-                <v-btn
-                  color="primary"
-                  type="submit"
-                  :disabled="
-                    Object.keys(errors).length > 0
-                  "
-                  >Salvar</v-btn
-                >
-
-                <v-btn
-                  color="error"
-                  @click="isOpen = false"
-                  >Fechar</v-btn
-                >
-              </v-card-actions>
-            </v-form>
-          </v-card>
-        </v-dialog>
-      </v-col>
-    </v-row>
-  </v-container>
+          Cancelar
+        </v-btn>
+        <v-btn
+          color="primary"
+          variant="elevated"
+          class="px-6"
+          type="submit"
+          :disabled="Object.keys(errors).length > 0"
+          @click="submit"
+        >
+          <v-icon start size="18">mdi-content-save</v-icon>
+          Salvar
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
@@ -137,3 +157,32 @@ const submit = () => {
   })
 }
 </script>
+
+<style scoped>
+.edit-user-dialog {
+  backdrop-filter: blur(4px);
+}
+
+.edit-user-card {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.dialog-header {
+  background: linear-gradient(135deg, rgba(25, 118, 210, 0.05) 0%, rgba(25, 118, 210, 0.02) 100%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.form-container {
+  max-width: 100%;
+}
+
+.v-text-field, .v-select {
+  transition: all 0.3s ease;
+}
+
+.v-text-field:hover, .v-select:hover {
+  transform: translateY(-1px);
+}
+
+</style>
