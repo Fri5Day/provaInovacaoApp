@@ -69,6 +69,7 @@
       />
 
       <v-list-item
+        :to="{ name: 'rooms' }"
         link
         prepend-icon="mdi-home"
         title="Salas"
@@ -77,6 +78,7 @@
       />
 
       <v-list-item
+        :to="{ name: 'bookings' }"
         link
         prepend-icon="mdi-calendar-check"
         title="Reservas"

@@ -4,47 +4,39 @@
     <v-row>
       <v-col>
         <div class="mb-4">
-          <h1 class="text-h4 font-weight-bold text-primary mb-2">
-            Gerenciamento de Usuários
+          <h1
+            class="text-h4 font-weight-bold text-primary mb-2"
+          >
+            Gerenciamento de Reservas
           </h1>
           <p class="text-body-1 text-medium-emphasis">
-            Gerencie os usuários do sistema
+            Gerencie todas as reservas do sistema
           </p>
         </div>
         <div class="d-flex justify-end mt-5">
           <v-btn
-            color="primary"
+            color="info"
             size="large"
             @click="dialog = true"
           >
             <v-icon start>mdi-plus</v-icon>
-            Novo Usuário
+            Nova Reserva
           </v-btn>
         </div>
         <v-card class="mt-6" elevation="2">
           <v-card-title class="d-flex align-center pa-6">
-            <v-icon class="mr-3" color="primary">mdi-account-group</v-icon>
-            <span class="text-h5 font-weight-bold">Usuários Cadastrados</span>
+            <v-icon class="mr-3" color="info"
+              >mdi-calendar</v-icon
+            >
+            <span class="text-h5 font-weight-bold"
+              >Reservas Cadastradas</span
+            >
           </v-card-title>
           <v-data-table
             class="border-pacit-100"
             :headers="headers"
-            :items="users"
+            :items="bookings"
           >
-            <template #[`item.role`]="{ item }">
-              <v-chip
-                :color="
-                  item.role === 'Administrador'
-                    ? 'primary'
-                    : 'success'
-                "
-                variant="tonal"
-                size="small"
-              >
-                {{ item.role }}
-              </v-chip>
-            </template>
-
             <template #[`item.actions`]="{ item }">
               <v-menu>
                 <template #activator="{ props }">
@@ -60,7 +52,7 @@
                 </template>
 
                 <v-list>
-                  <v-list-item @click="editUser(item.id)">
+                  <v-list-item @click="editBooking(item.id)">
                     <template #prepend>
                       <EditIcon
                         stroke-width="1.5"
@@ -74,7 +66,7 @@
                     </v-list-item-title>
                   </v-list-item>
 
-                  <v-list-item @click="deleteUser(item.id)">
+                  <v-list-item @click="deleteBooking(item.id)">
                     <template #prepend>
                       <TrashIcon
                         stroke-width="1.5"
@@ -95,19 +87,19 @@
       </v-col>
     </v-row>
 
-    <CreateUserComponent
+    <CreateBookingComponent
       v-model:dialog="dialog"
-      @save-user="handleCreateUser"
+      @save-booking="handleCreateBooking"
     />
 
-    <EditUserComponent
+    <EditBookingComponent
       v-model:dialog="editDialog"
-      v-model:name="editUserData.name"
-      v-model:email="editUserData.email"
-      v-model:password="editUserData.password"
-      v-model:role="editUserData.role"
+      v-model:name="editBookingData.name"
+      v-model:dateInit="editBookingData.dateInit"
+      v-model:dateEnd="editBookingData.dateEnd"
+      v-model:room_id="editBookingData.room_id"
       :errors="editErrors"
-      @submit="handleEditUser"
+      @submit="handleEditBooking"
     />
 
     <v-dialog
@@ -128,7 +120,7 @@
             >
           </v-avatar>
           <h2 class="text-h5 font-weight-bold mb-2">
-            Excluir Usuário
+            Excluir Reserva
           </h2>
           <p class="text-body-1 text-medium-emphasis ma-0">
             Esta ação não pode ser desfeita
@@ -139,8 +131,8 @@
 
         <v-card-text class="pa-6 text-center">
           <p class="text-body-1 mb-0">
-            Tem certeza que deseja excluir este usuário?
-            Todos os dados serão perdidos permanentemente.
+            Tem certeza que deseja excluir esta reserva? Todos
+            os dados serão perdidos permanentemente.
           </p>
         </v-card-text>
 
@@ -172,11 +164,11 @@
 import { ref, onMounted } from 'vue'
 import NavbarComponent from '@/components/NavbarComponent.vue'
 
-import type { UserInterface } from '@/interface/users/usersInterface'
-import type { CreateUserInterface } from '@/interface/users/createUsersInterface'
+import CreateBookingComponent from '@/components/bookings/CreateBookingComponent.vue'
+import EditBookingComponent from '@/components/bookings/EditBookingComponent.vue'
 
-import CreateUserComponent from '@/components/users/CreateUserComponent.vue'
-import EditUserComponent from '@/components/users/EditUserComponent.vue'
+import type { BookingsInterface } from '@/interface/bookings/bookingsInterface'
+import type { CreateBookingsInterface } from '@/interface/bookings/createBookingsInterface'
 
 import {
   DotsVerticalIcon,
@@ -184,44 +176,60 @@ import {
   TrashIcon,
 } from 'vue-tabler-icons'
 
-import { getUsers } from '@/api/users/getUsers'
-import { postUsers } from '@/api/users/postUsers'
-import { deleteUsers } from '@/api/users/deleteUsers'
-import { putUsers } from '@/api/users/putUsers'
+import { getBookings } from '@/api/bookings/getBookings'
+import { postBookings } from '@/api/bookings/postBookings'
+import { putBookings } from '@/api/bookings/putBookings'
+import { deleteBookings } from '@/api/bookings/deleteBookings'
 
-const users = ref<UserInterface[]>([])
+const bookings = ref<BookingsInterface[]>([])
 const dialog = ref(false)
-const deleteDialog = ref(false)
 const editDialog = ref(false)
-const userToDelete = ref<number | null>(null)
-const editUserData = ref({
+const deleteDialog = ref(false)
+const bookingTodelete = ref<number | null>(null)
+const editBookingData = ref({
   id: 0,
   name: '',
-  email: '',
-  password: '',
-  role: 'Usuário',
+  dateInit: '',
+  dateEnd: '',
+  room_id: null as number | null,
+  user_id: 1,
 })
-const editErrors = ref<{
-  [key: string]: string[]
-}>({})
+const editErrors = ref<{ [key: string]: string[] }>({})
 
 const headers = [
-  { title: 'Nome Completo', key: 'name' },
-  { title: 'E-mail', key: 'email' },
-  { title: 'Perfil', key: 'role' },
+  { title: 'Nome', key: 'name' },
+  { title: 'Data Ini.', key: 'dateInit' },
+  { title: 'Data Fim', key: 'dateEnd' },
+  { title: 'Criado Por', key: 'user.name' },
+  { title: 'Sala', key: 'room.name' },
   { title: 'Ações', key: 'actions', sortable: false },
 ]
 
 onMounted(() => {
-  loadUsers()
+  loadBookings()
 })
 
-const handleCreateUser = async (
-  userData: CreateUserInterface,
-) => {
+const loadBookings = async () => {
   try {
-    await postUsers(userData)
-    await loadUsers()
+    const response = await getBookings()
+    bookings.value = response
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
+
+const handleCreateBooking = async (bookingData: CreateBookingsInterface) => {
+  try {
+    const { room, ...restData } = bookingData
+    const apiData = {
+      ...restData,
+      room_id: room,
+      user_id: 1
+    }
+
+    await postBookings(apiData)
+    await loadBookings()
     dialog.value = false
   } catch (error) {
     console.error(error)
@@ -229,54 +237,51 @@ const handleCreateUser = async (
   }
 }
 
-const loadUsers = async () => {
+const editBooking = (id: number) => {
+  const booking = bookings.value.find((r) => r.id === id)
+  if (booking) {
+    editBookingData.value = {
+      id: booking.id,
+      name: booking.name,
+      dateInit: booking.dateInit,
+      dateEnd: booking.dateEnd,
+      room_id: booking.room_id,
+      user_id: booking.user_id,
+    }
+    editDialog.value = true
+  }
+}
+
+const handleEditBooking = async (
+  bookingData: any,
+) => {
   try {
-    const response = await getUsers()
-    users.value = response
+    const apiData = {
+      ...bookingData,
+      room_id: editBookingData.value.room_id,
+      user_id: editBookingData.value.user_id
+    }
+    await putBookings(editBookingData.value.id, apiData)
+    await loadBookings()
+    editDialog.value = false
   } catch (error) {
     console.error(error)
     throw error
   }
 }
 
-const editUser = (id: number) => {
-  const user = users.value.find((u) => u.id === id)
-  if (user) {
-    editUserData.value = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      password: user.password,
-      role: user.role,
-    }
-    editDialog.value = true
-  }
-}
-
-const handleEditUser = async (
-  userData: CreateUserInterface,
-) => {
-  try {
-    await putUsers(editUserData.value.id, userData)
-    await loadUsers()
-    editDialog.value = false
-  } catch (error) {
-    console.error(error)
-  }
-}
-
-const deleteUser = (id: number) => {
-  userToDelete.value = id
+const deleteBooking = async (id: number) => {
+  bookingTodelete.value = id
   deleteDialog.value = true
 }
 
 const confirmDelete = async () => {
-  if (userToDelete.value) {
+  if (bookingTodelete.value) {
     try {
-      await deleteUsers(userToDelete.value)
-      await loadUsers()
+      await deleteBookings(bookingTodelete.value)
+      await loadBookings()
       deleteDialog.value = false
-      userToDelete.value = null
+      bookingTodelete.value = null
     } catch (error) {
       console.error(error)
       throw error
@@ -284,23 +289,3 @@ const confirmDelete = async () => {
   }
 }
 </script>
-
-<style scoped>
-.delete-dialog {
-  backdrop-filter: blur(4px);
-}
-
-.delete-card {
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-.dialog-header {
-  background: linear-gradient(
-    135deg,
-    rgba(244, 67, 54, 0.05) 0%,
-    rgba(244, 67, 54, 0.02) 100%
-  );
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-}
-</style>

@@ -4,47 +4,39 @@
     <v-row>
       <v-col>
         <div class="mb-4">
-          <h1 class="text-h4 font-weight-bold text-primary mb-2">
-            Gerenciamento de Usuários
+          <h1
+            class="text-h4 font-weight-bold text-primary mb-2"
+          >
+            Gerenciamento de Salas
           </h1>
           <p class="text-body-1 text-medium-emphasis">
-            Gerencie os usuários do sistema
+            Gerencie as salas disponíveis no sistema
           </p>
         </div>
         <div class="d-flex justify-end mt-5">
           <v-btn
-            color="primary"
+            color="success"
             size="large"
             @click="dialog = true"
           >
             <v-icon start>mdi-plus</v-icon>
-            Novo Usuário
+            Nova Sala
           </v-btn>
         </div>
         <v-card class="mt-6" elevation="2">
           <v-card-title class="d-flex align-center pa-6">
-            <v-icon class="mr-3" color="primary">mdi-account-group</v-icon>
-            <span class="text-h5 font-weight-bold">Usuários Cadastrados</span>
+            <v-icon class="mr-3" color="success"
+              >mdi-home-group</v-icon
+            >
+            <span class="text-h5 font-weight-bold"
+              >Salas Cadastradas</span
+            >
           </v-card-title>
           <v-data-table
             class="border-pacit-100"
             :headers="headers"
-            :items="users"
+            :items="rooms"
           >
-            <template #[`item.role`]="{ item }">
-              <v-chip
-                :color="
-                  item.role === 'Administrador'
-                    ? 'primary'
-                    : 'success'
-                "
-                variant="tonal"
-                size="small"
-              >
-                {{ item.role }}
-              </v-chip>
-            </template>
-
             <template #[`item.actions`]="{ item }">
               <v-menu>
                 <template #activator="{ props }">
@@ -60,7 +52,7 @@
                 </template>
 
                 <v-list>
-                  <v-list-item @click="editUser(item.id)">
+                  <v-list-item @click="editRoom(item.id)">
                     <template #prepend>
                       <EditIcon
                         stroke-width="1.5"
@@ -74,7 +66,7 @@
                     </v-list-item-title>
                   </v-list-item>
 
-                  <v-list-item @click="deleteUser(item.id)">
+                  <v-list-item @click="deleteRoom(item.id)">
                     <template #prepend>
                       <TrashIcon
                         stroke-width="1.5"
@@ -95,19 +87,18 @@
       </v-col>
     </v-row>
 
-    <CreateUserComponent
+    <CreateRoomComponent
       v-model:dialog="dialog"
-      @save-user="handleCreateUser"
+      @save-room="handleCreateRoom"
     />
 
-    <EditUserComponent
+    <EditRoomComponent
       v-model:dialog="editDialog"
-      v-model:name="editUserData.name"
-      v-model:email="editUserData.email"
-      v-model:password="editUserData.password"
-      v-model:role="editUserData.role"
+      v-model:name="editRoomData.name"
+      v-model:size="editRoomData.size"
+      v-model:note="editRoomData.note"
       :errors="editErrors"
-      @submit="handleEditUser"
+      @submit="handleEditRoom"
     />
 
     <v-dialog
@@ -128,7 +119,7 @@
             >
           </v-avatar>
           <h2 class="text-h5 font-weight-bold mb-2">
-            Excluir Usuário
+            Excluir Sala
           </h2>
           <p class="text-body-1 text-medium-emphasis ma-0">
             Esta ação não pode ser desfeita
@@ -139,8 +130,8 @@
 
         <v-card-text class="pa-6 text-center">
           <p class="text-body-1 mb-0">
-            Tem certeza que deseja excluir este usuário?
-            Todos os dados serão perdidos permanentemente.
+            Tem certeza que deseja excluir esta sala? Todos
+            os dados serão perdidos permanentemente.
           </p>
         </v-card-text>
 
@@ -172,11 +163,11 @@
 import { ref, onMounted } from 'vue'
 import NavbarComponent from '@/components/NavbarComponent.vue'
 
-import type { UserInterface } from '@/interface/users/usersInterface'
-import type { CreateUserInterface } from '@/interface/users/createUsersInterface'
+import CreateRoomComponent from '@/components/rooms/CreateRoomComponent.vue'
+import EditRoomComponent from '@/components/rooms/EditRoomComponent.vue'
 
-import CreateUserComponent from '@/components/users/CreateUserComponent.vue'
-import EditUserComponent from '@/components/users/EditUserComponent.vue'
+import type { RoomsInterface } from '@/interface/rooms/roomsInterface'
+import type { CreateRoomsInterface } from '@/interface/rooms/createRoomsInterface'
 
 import {
   DotsVerticalIcon,
@@ -184,44 +175,49 @@ import {
   TrashIcon,
 } from 'vue-tabler-icons'
 
-import { getUsers } from '@/api/users/getUsers'
-import { postUsers } from '@/api/users/postUsers'
-import { deleteUsers } from '@/api/users/deleteUsers'
-import { putUsers } from '@/api/users/putUsers'
+import { getRooms } from '@/api/rooms/getRooms'
+import { putRooms } from '@/api/rooms/putRooms'
+import { deleteRooms } from '@/api/rooms/deleteRooms'
+import { postRooms } from '@/api/rooms/postRooms'
 
-const users = ref<UserInterface[]>([])
+const rooms = ref<RoomsInterface[]>([])
 const dialog = ref(false)
-const deleteDialog = ref(false)
 const editDialog = ref(false)
-const userToDelete = ref<number | null>(null)
-const editUserData = ref({
+const deleteDialog = ref(false)
+const roomTodelete = ref<number | null>(null)
+const editRoomData = ref({
   id: 0,
   name: '',
-  email: '',
-  password: '',
-  role: 'Usuário',
+  size: 0,
+  note: '',
 })
-const editErrors = ref<{
-  [key: string]: string[]
-}>({})
+const editErrors = ref<{ [key: string]: string[] }>({})
 
 const headers = [
-  { title: 'Nome Completo', key: 'name' },
-  { title: 'E-mail', key: 'email' },
-  { title: 'Perfil', key: 'role' },
+  { title: 'Nome da Sala', key: 'name' },
+  { title: 'Capacidade', key: 'size' },
+  { title: 'Observações', key: 'note' },
   { title: 'Ações', key: 'actions', sortable: false },
 ]
 
 onMounted(() => {
-  loadUsers()
+  loadRooms()
 })
 
-const handleCreateUser = async (
-  userData: CreateUserInterface,
-) => {
+const loadRooms = async () => {
   try {
-    await postUsers(userData)
-    await loadUsers()
+    const response = await getRooms()
+    rooms.value = response
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
+
+const handleCreateRoom = async (roomData: CreateRoomsInterface) => {
+  try {
+    await postRooms(roomData)
+    await loadRooms()
     dialog.value = false
   } catch (error) {
     console.error(error)
@@ -229,54 +225,44 @@ const handleCreateUser = async (
   }
 }
 
-const loadUsers = async () => {
+const editRoom = (id: number) => {
+  const room = rooms.value.find((r) => r.id === id)
+  if (room) {
+    editRoomData.value = {
+      id: room.id,
+      name: room.name,
+      size: room.size,
+      note: room.note,
+    }
+    editDialog.value = true
+  }
+}
+
+const handleEditRoom = async (
+  roomData: CreateRoomsInterface,
+) => {
   try {
-    const response = await getUsers()
-    users.value = response
+    await putRooms(editRoomData.value.id, roomData)
+    await loadRooms()
+    editDialog.value = false
   } catch (error) {
     console.error(error)
     throw error
   }
 }
 
-const editUser = (id: number) => {
-  const user = users.value.find((u) => u.id === id)
-  if (user) {
-    editUserData.value = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      password: user.password,
-      role: user.role,
-    }
-    editDialog.value = true
-  }
-}
-
-const handleEditUser = async (
-  userData: CreateUserInterface,
-) => {
-  try {
-    await putUsers(editUserData.value.id, userData)
-    await loadUsers()
-    editDialog.value = false
-  } catch (error) {
-    console.error(error)
-  }
-}
-
-const deleteUser = (id: number) => {
-  userToDelete.value = id
+const deleteRoom = async (id: number) => {
+  roomTodelete.value = id
   deleteDialog.value = true
 }
 
 const confirmDelete = async () => {
-  if (userToDelete.value) {
+  if (roomTodelete.value) {
     try {
-      await deleteUsers(userToDelete.value)
-      await loadUsers()
+      await deleteRooms(roomTodelete.value)
+      await loadRooms()
       deleteDialog.value = false
-      userToDelete.value = null
+      roomTodelete.value = null
     } catch (error) {
       console.error(error)
       throw error
@@ -284,23 +270,3 @@ const confirmDelete = async () => {
   }
 }
 </script>
-
-<style scoped>
-.delete-dialog {
-  backdrop-filter: blur(4px);
-}
-
-.delete-card {
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-.dialog-header {
-  background: linear-gradient(
-    135deg,
-    rgba(244, 67, 54, 0.05) 0%,
-    rgba(244, 67, 54, 0.02) 100%
-  );
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-}
-</style>

@@ -1,8 +1,8 @@
 import api from '../axios'
 
-export const deleteUsers = async (id: number) => {
+export const deleteBookings = async (id: number) => {
   try {
-    const response = await api.delete(`/user/${id}`)
+    const response = await api.delete(`reservas/${id}`)
     return response.data
   } catch (error) {
     console.error(error)

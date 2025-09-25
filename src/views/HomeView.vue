@@ -52,7 +52,7 @@
                     class="feature-card pa-6 text-center"
                     elevation="2"
                     hover
-                    @click="a"
+                    @click="$router.push({name: 'rooms'})"
                   >
                     <div class="feature-icon mb-4">
                       <v-avatar color="success" size="64" class="elevation-2">
@@ -75,7 +75,7 @@
                     class="feature-card pa-6 text-center"
                     elevation="2"
                     hover
-                    @click="a"
+                    @click="$router.push({name: 'bookings'})"
                   >
                     <div class="feature-icon mb-4">
                       <v-avatar color="info" size="64" class="elevation-2">

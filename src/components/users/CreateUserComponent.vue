@@ -5,17 +5,10 @@
     persistent
     class="create-user-dialog"
   >
-    <v-card
-      class="create-user-card"
-      elevation="12"
-    >
+    <v-card class="create-user-card" elevation="12">
       <div class="dialog-header pa-6 pb-4">
         <div class="d-flex align-center">
-          <v-avatar
-            color="primary"
-            size="48"
-            class="mr-4"
-          >
+          <v-avatar color="primary" size="48" class="mr-4">
             <v-icon color="white" size="24"
               >mdi-account-plus</v-icon
             >
@@ -29,8 +22,7 @@
             <p
               class="text-body-2 text-medium-emphasis ma-0"
             >
-              Preencha os dados para criar um novo
-              usuário
+              Preencha os dados para criar um novo usuário
             </p>
           </div>
         </div>
@@ -102,9 +94,7 @@
           :disabled="Object.keys(errors).length > 0"
           @click="saveUser"
         >
-          <v-icon start size="18"
-            >mdi-content-save</v-icon
-          >
+          <v-icon start size="18">mdi-content-save</v-icon>
           Salvar
         </v-btn>
       </v-card-actions>
@@ -124,10 +114,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits([
-  'update:dialog',
-  'save-user',
-])
+const emit = defineEmits(['update:dialog', 'save-user'])
 
 const { handleSubmit, errors, resetForm } = useForm({
   validationSchema: userSchema,
