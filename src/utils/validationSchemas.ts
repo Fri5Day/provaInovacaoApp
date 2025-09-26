@@ -29,7 +29,7 @@ export const bookingSchema = object({
   name: string()
     .required('O Título da reserva é obrigatório')
     .label('Nome'),
-  room: string()
+  room_id: string()
     .required('A sala é obrigatória')
     .label('Sala'),
   dateInit: string()

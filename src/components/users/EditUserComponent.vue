@@ -64,7 +64,8 @@
           <v-text-field
             v-model="passwordModel"
             :error-messages="errors.password"
-            label="Senha"
+            label="Nova Senha (opcional)"
+            placeholder="Deixe em branco para manter a senha atual"
             variant="outlined"
             prepend-inner-icon="mdi-lock"
             density="comfortable"
@@ -149,12 +150,18 @@ const roleModel = computed({
 })
 
 const submit = () => {
-  emit('submit', {
+  const userData: any = {
     name: props.name,
     email: props.email,
-    password: props.password,
     role: props.role,
-  })
+  }
+  
+  // Só inclui senha se foi preenchida
+  if (props.password && props.password.trim() !== '') {
+    userData.password = props.password
+  }
+  
+  emit('submit', userData)
 }
 </script>
 

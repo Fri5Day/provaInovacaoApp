@@ -3,22 +3,35 @@
     <NavbarComponent />
     <div class="hero-section">
       <v-container class="fill-height">
-        <v-row justify="center" align="center" class="fill-height">
+        <v-row
+          justify="center"
+          align="center"
+          class="fill-height"
+        >
           <v-col cols="12" lg="10">
-
             <div class="text-center mb-12">
               <div class="hero-avatar mb-6">
-                <v-avatar color="primary" size="120" class="elevation-8">
-                  <v-icon color="white" size="60">mdi-store</v-icon>
+                <v-avatar size="120" class="elevation-8">
+                  <img
+                    :src="logo"
+                    alt="TekRoom Logo"
+                    style="
+                      width: 100%;
+                      height: 100%;
+                      object-fit: contain;
+                    "
+                  />
                 </v-avatar>
               </div>
 
               <h1 class="hero-title mb-4">
-                Bem-vindo ao <span class="text-primary">TekRoom!</span>
+                Bem-vindo ao
+                <span class="text-primary">TekRoom!</span>
               </h1>
 
               <p class="hero-subtitle mb-8">
-                Sistema inteligente de gerenciamento de reservas de salas
+                Sistema inteligente de gerenciamento de
+                reservas de salas
               </p>
             </div>
 
@@ -32,17 +45,35 @@
                     @click="$router.push({ name: 'users' })"
                   >
                     <div class="feature-icon mb-4">
-                      <v-avatar color="primary" size="64" class="elevation-2">
-                        <v-icon color="white" size="32">mdi-account-group</v-icon>
+                      <v-avatar
+                        color="primary"
+                        size="64"
+                        class="elevation-2"
+                      >
+                        <v-icon color="white" size="32"
+                          >mdi-account-group</v-icon
+                        >
                       </v-avatar>
                     </div>
-                    <h3 class="text-h6 font-weight-bold mb-2">Usuários</h3>
-                    <p class="text-body-2 text-medium-emphasis mb-4">
+                    <h3
+                      class="text-h6 font-weight-bold mb-2"
+                    >
+                      Usuários
+                    </h3>
+                    <p
+                      class="text-body-2 text-medium-emphasis mb-4"
+                    >
                       Gerencie usuários
                     </p>
-                    <v-btn color="primary" variant="text" size="small">
+                    <v-btn
+                      color="primary"
+                      variant="text"
+                      size="small"
+                    >
                       Acessar
-                      <v-icon end size="16">mdi-arrow-right</v-icon>
+                      <v-icon end size="16"
+                        >mdi-arrow-right</v-icon
+                      >
                     </v-btn>
                   </v-card>
                 </v-col>
@@ -52,20 +83,38 @@
                     class="feature-card pa-6 text-center"
                     elevation="2"
                     hover
-                    @click="$router.push({name: 'rooms'})"
+                    @click="$router.push({ name: 'rooms' })"
                   >
                     <div class="feature-icon mb-4">
-                      <v-avatar color="success" size="64" class="elevation-2">
-                        <v-icon color="white" size="32">mdi-home</v-icon>
+                      <v-avatar
+                        color="success"
+                        size="64"
+                        class="elevation-2"
+                      >
+                        <v-icon color="white" size="32"
+                          >mdi-home</v-icon
+                        >
                       </v-avatar>
                     </div>
-                    <h3 class="text-h6 font-weight-bold mb-2">Salas</h3>
-                    <p class="text-body-2 text-medium-emphasis mb-4">
+                    <h3
+                      class="text-h6 font-weight-bold mb-2"
+                    >
+                      Salas
+                    </h3>
+                    <p
+                      class="text-body-2 text-medium-emphasis mb-4"
+                    >
                       Cadastre e gerencie salas
                     </p>
-                    <v-btn color="success" variant="text" size="small">
+                    <v-btn
+                      color="success"
+                      variant="text"
+                      size="small"
+                    >
                       Acessar
-                      <v-icon end size="16">mdi-arrow-right</v-icon>
+                      <v-icon end size="16"
+                        >mdi-arrow-right</v-icon
+                      >
                     </v-btn>
                   </v-card>
                 </v-col>
@@ -75,20 +124,40 @@
                     class="feature-card pa-6 text-center"
                     elevation="2"
                     hover
-                    @click="$router.push({name: 'bookings'})"
+                    @click="
+                      $router.push({ name: 'bookings' })
+                    "
                   >
                     <div class="feature-icon mb-4">
-                      <v-avatar color="info" size="64" class="elevation-2">
-                        <v-icon color="white" size="32">mdi-calendar-check</v-icon>
+                      <v-avatar
+                        color="info"
+                        size="64"
+                        class="elevation-2"
+                      >
+                        <v-icon color="white" size="32"
+                          >mdi-calendar-check</v-icon
+                        >
                       </v-avatar>
                     </div>
-                    <h3 class="text-h6 font-weight-bold mb-2">Reservas</h3>
-                    <p class="text-body-2 text-medium-emphasis mb-4">
+                    <h3
+                      class="text-h6 font-weight-bold mb-2"
+                    >
+                      Reservas
+                    </h3>
+                    <p
+                      class="text-body-2 text-medium-emphasis mb-4"
+                    >
                       Controle de reservas
                     </p>
-                    <v-btn color="info" variant="text" size="small">
+                    <v-btn
+                      color="info"
+                      variant="text"
+                      size="small"
+                    >
                       Acessar
-                      <v-icon end size="16">mdi-arrow-right</v-icon>
+                      <v-icon end size="16"
+                        >mdi-arrow-right</v-icon
+                      >
                     </v-btn>
                   </v-card>
                 </v-col>
@@ -103,13 +172,17 @@
 
 <script setup lang="ts">
 import NavbarComponent from '@/components/NavbarComponent.vue'
-
+import logo from '@/assets/images/Tek.png'
 </script>
 
 <style scoped>
 .home-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  background: linear-gradient(
+    135deg,
+    #f8fafc 0%,
+    #e2e8f0 100%
+  );
   position: relative;
 }
 
@@ -124,8 +197,13 @@ import NavbarComponent from '@/components/NavbarComponent.vue'
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .hero-title {
@@ -159,7 +237,7 @@ import NavbarComponent from '@/components/NavbarComponent.vue'
 
 .feature-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
   border-color: #cbd5e1;
 }
 
@@ -181,7 +259,7 @@ import NavbarComponent from '@/components/NavbarComponent.vue'
 
 .cta-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(25,118,210,0.3);
+  box-shadow: 0 8px 16px rgba(25, 118, 210, 0.3);
 }
 
 @media (max-width: 960px) {

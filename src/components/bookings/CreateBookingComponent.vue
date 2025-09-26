@@ -46,8 +46,8 @@
           />
 
           <v-autocomplete
-            v-model="room"
-            :error-messages="errors.room"
+            v-model="room_id"
+            :error-messages="errors.room_id"
             label="Selecione a Sala"
             variant="outlined"
             prepend-inner-icon="mdi-home-variant"
@@ -132,7 +132,7 @@ const { handleSubmit, errors, resetForm } = useForm({
 })
 
 const { value: name } = useField('name')
-const { value: room } = useField('room')
+const { value: room_id } = useField('room_id')
 const { value: dateInit } = useField('dateInit')
 const { value: dateEnd } = useField('dateEnd')
 

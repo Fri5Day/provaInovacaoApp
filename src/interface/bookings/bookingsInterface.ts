@@ -3,6 +3,6 @@ export interface BookingsInterface {
   name: string
   dateInit: string
   dateEnd: string
-  user: string
-  room: string
+  user_id: number
+  room_id: number
 }

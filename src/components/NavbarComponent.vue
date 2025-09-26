@@ -24,23 +24,22 @@
   >
     <div class="drawer-header">
       <div class="d-flex align-center pa-4">
-        <v-avatar
-          color="primary"
-          class="mr-3"
-          size="40"
-        >
-          <v-icon
-            color="white"
-            icon="mdi-store"
+        <v-avatar class="mr-3" size="40">
+          <img
+            :src="logo"
+            alt="TekRoom Logo"
+            style="
+              width: 100%;
+              height: 100%;
+              object-fit: contain;
+            "
           />
         </v-avatar>
         <div>
           <div class="text-h6 font-weight-bold">
             TekRoom
           </div>
-          <div
-            class="text-caption text-medium-emphasis"
-          >
+          <div class="text-caption text-medium-emphasis">
             Sistema de reservas
           </div>
         </div>
@@ -85,13 +84,46 @@
         class="mb-1"
         rounded="lg"
       />
+
+      <v-divider class="my-2" />
+
+      <v-list-item
+        @click="profileDialog = true"
+        prepend-icon="mdi-account-circle"
+        title="Meu Perfil"
+        class="mb-1"
+        rounded="lg"
+      />
+
+      <v-list-item
+        @click="handleLogout"
+        prepend-icon="mdi-logout"
+        title="Sair"
+        class="mb-1"
+        rounded="lg"
+      />
     </v-list>
   </v-navigation-drawer>
+
+  <ProfileComponent v-model:dialog="profileDialog" />
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import ProfileComponent from '@/components/profile/ProfileComponent.vue'
+import logo from '@/assets/images/Tek.png'
+
 const drawer = ref(true)
+const profileDialog = ref(false)
+const router = useRouter()
+const authStore = useAuthStore()
+
+const handleLogout = () => {
+  authStore.logout()
+  router.push({ name: 'login' })
+}
 </script>
 
 <style scoped>
@@ -100,8 +132,7 @@ const drawer = ref(true)
   top: 20px;
   left: 20px;
   z-index: 1001;
-  transition: all 0.3s
-    cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(0, 0, 0, 0.08);
@@ -126,15 +157,11 @@ const drawer = ref(true)
     rgb(var(--v-theme-surface)) 0%,
     rgba(var(--v-theme-primary), 0.05) 100%
   );
-  border-bottom: 1px solid
-    rgba(var(--v-border-color), 0.12);
+  border-bottom: 1px solid rgba(var(--v-border-color), 0.12);
 }
 
 .v-list-item--active {
-  background-color: rgba(
-    var(--v-theme-primary),
-    0.1
-  );
+  background-color: rgba(var(--v-theme-primary), 0.1);
   color: rgb(var(--v-theme-primary));
 }
 </style>

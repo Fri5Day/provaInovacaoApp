@@ -156,12 +156,20 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <ErrorComponent
+      v-model:isActive="errorDialog"
+      :errorMessage="errorMessage"
+      :status="errorStatus"
+      :text="errorText"
+    />
   </v-container>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import NavbarComponent from '@/components/NavbarComponent.vue'
+import ErrorComponent from '@/components/ErrorComponent.vue'
 
 import CreateRoomComponent from '@/components/rooms/CreateRoomComponent.vue'
 import EditRoomComponent from '@/components/rooms/EditRoomComponent.vue'
@@ -179,6 +187,9 @@ import { getRooms } from '@/api/rooms/getRooms'
 import { putRooms } from '@/api/rooms/putRooms'
 import { deleteRooms } from '@/api/rooms/deleteRooms'
 import { postRooms } from '@/api/rooms/postRooms'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
 
 const rooms = ref<RoomsInterface[]>([])
 const dialog = ref(false)
@@ -190,8 +201,15 @@ const editRoomData = ref({
   name: '',
   size: 0,
   note: '',
+  user_id: 0,
 })
 const editErrors = ref<{ [key: string]: string[] }>({})
+
+// Estados do ErrorComponent
+const errorDialog = ref(false)
+const errorMessage = ref('')
+const errorStatus = ref(0)
+const errorText = ref('')
 
 const headers = [
   { title: 'Nome da Sala', key: 'name' },
@@ -204,24 +222,37 @@ onMounted(() => {
   loadRooms()
 })
 
+const showError = (error: any, operation: string) => {
+  errorStatus.value = error.response?.status || 500
+  errorMessage.value = error.response?.data?.message || error.message || 'Erro desconhecido'
+  errorText.value = `Erro ao ${operation}`
+  errorDialog.value = true
+}
+
 const loadRooms = async () => {
   try {
     const response = await getRooms()
     rooms.value = response
   } catch (error) {
     console.error(error)
-    throw error
+    showError(error, 'carregar salas')
   }
 }
 
-const handleCreateRoom = async (roomData: CreateRoomsInterface) => {
+const handleCreateRoom = async (
+  roomData: CreateRoomsInterface,
+) => {
   try {
-    await postRooms(roomData)
+    const apiData = {
+      ...roomData,
+      user_id: authStore.user.id,
+    }
+    await postRooms(apiData)
     await loadRooms()
     dialog.value = false
   } catch (error) {
     console.error(error)
-    throw error
+    showError(error, 'criar sala')
   }
 }
 
@@ -233,6 +264,7 @@ const editRoom = (id: number) => {
       name: room.name,
       size: room.size,
       note: room.note,
+      user_id: room.user_id,
     }
     editDialog.value = true
   }
@@ -242,12 +274,16 @@ const handleEditRoom = async (
   roomData: CreateRoomsInterface,
 ) => {
   try {
-    await putRooms(editRoomData.value.id, roomData)
+    const apiData = {
+      ...roomData,
+      user_id: editRoomData.value.user_id,
+    }
+    await putRooms(editRoomData.value.id, apiData)
     await loadRooms()
     editDialog.value = false
   } catch (error) {
     console.error(error)
-    throw error
+    showError(error, 'editar sala')
   }
 }
 
@@ -265,7 +301,7 @@ const confirmDelete = async () => {
       roomTodelete.value = null
     } catch (error) {
       console.error(error)
-      throw error
+      showError(error, 'excluir sala')
     }
   }
 }

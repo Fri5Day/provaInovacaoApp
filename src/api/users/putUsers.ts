@@ -6,7 +6,7 @@ export const putUsers = async (
   data: CreateUserInterface,
 ) => {
   try {
-    const response = await api.put(`/user/${id}`, data)
+    const response = await api.patch(`/user/${id}`, data)
     return response.data
   } catch (error) {
     console.error('Error updating user:', error)

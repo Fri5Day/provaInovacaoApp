@@ -42,7 +42,7 @@
 
           <v-autocomplete
             v-model="roomModel"
-            :error-messages="errors.room"
+            :error-messages="errors.room_id"
             label="Selecione a Sala"
             variant="outlined"
             prepend-inner-icon="mdi-home-variant"
@@ -109,7 +109,8 @@
 
 <script setup lang="ts">
 import { computed, ref, watch, onMounted } from 'vue'
-import { getRooms } from '@/api/rooms/getRooms';
+import { getRooms } from '@/api/rooms/getRooms'
+import { formatToDatetimeLocal, formatToISO } from '@/utils/dateFormatter'
 
 const rooms = ref([])
 
@@ -143,13 +144,13 @@ const nameModel = computed({
 })
 
 const dateInitModel = computed({
-  get: () => props.dateInit,
-  set: (value) => emit('update:dateInit', value),
+  get: () => formatToDatetimeLocal(props.dateInit),
+  set: (value) => emit('update:dateInit', formatToISO(value)),
 })
 
 const dateEndModel = computed({
-  get: () => props.dateEnd,
-  set: (value) => emit('update:dateEnd', value),
+  get: () => formatToDatetimeLocal(props.dateEnd),
+  set: (value) => emit('update:dateEnd', formatToISO(value)),
 })
 
 const roomModel = computed({

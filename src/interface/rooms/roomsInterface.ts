@@ -3,4 +3,5 @@ export interface RoomsInterface {
   name: string
   size: number
   note: string
+  user_id: number
 }

@@ -37,6 +37,14 @@
             :headers="headers"
             :items="bookings"
           >
+            <template #[`item.dateInit`]="{ item }">
+              {{ formatDateTime(item.dateInit) }}
+            </template>
+
+            <template #[`item.dateEnd`]="{ item }">
+              {{ formatDateTime(item.dateEnd) }}
+            </template>
+
             <template #[`item.actions`]="{ item }">
               <v-menu>
                 <template #activator="{ props }">
@@ -157,12 +165,20 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <ErrorComponent
+      v-model:isActive="errorDialog"
+      :errorMessage="errorMessage"
+      :status="errorStatus"
+      :text="errorText"
+    />
   </v-container>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import NavbarComponent from '@/components/NavbarComponent.vue'
+import ErrorComponent from '@/components/ErrorComponent.vue'
 
 import CreateBookingComponent from '@/components/bookings/CreateBookingComponent.vue'
 import EditBookingComponent from '@/components/bookings/EditBookingComponent.vue'
@@ -180,6 +196,10 @@ import { getBookings } from '@/api/bookings/getBookings'
 import { postBookings } from '@/api/bookings/postBookings'
 import { putBookings } from '@/api/bookings/putBookings'
 import { deleteBookings } from '@/api/bookings/deleteBookings'
+import { formatDateTime } from '@/utils/dateFormatter'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
 
 const bookings = ref<BookingsInterface[]>([])
 const dialog = ref(false)
@@ -196,6 +216,12 @@ const editBookingData = ref({
 })
 const editErrors = ref<{ [key: string]: string[] }>({})
 
+// Estados do ErrorComponent
+const errorDialog = ref(false)
+const errorMessage = ref('')
+const errorStatus = ref(0)
+const errorText = ref('')
+
 const headers = [
   { title: 'Nome', key: 'name' },
   { title: 'Data Ini.', key: 'dateInit' },
@@ -209,36 +235,40 @@ onMounted(() => {
   loadBookings()
 })
 
+const showError = (error: any, operation: string) => {
+  errorStatus.value = error.response?.status || 500
+  errorMessage.value = error.response?.data?.message || error.message || 'Erro desconhecido'
+  errorText.value = `Erro ao ${operation}`
+  errorDialog.value = true
+}
+
 const loadBookings = async () => {
   try {
     const response = await getBookings()
     bookings.value = response
   } catch (error) {
     console.error(error)
-    throw error
+    showError(error, 'carregar reservas')
   }
 }
 
 const handleCreateBooking = async (bookingData: CreateBookingsInterface) => {
   try {
-    const { room, ...restData } = bookingData
     const apiData = {
-      ...restData,
-      room_id: room,
-      user_id: 1
+      ...bookingData,
+      user_id: authStore.user.id
     }
-
     await postBookings(apiData)
     await loadBookings()
     dialog.value = false
   } catch (error) {
     console.error(error)
-    throw error
+    showError(error, 'criar reserva')
   }
 }
 
 const editBooking = (id: number) => {
-  const booking = bookings.value.find((r) => r.id === id)
+  const booking = bookings.value.find((b) => b.id === id)
   if (booking) {
     editBookingData.value = {
       id: booking.id,
@@ -253,12 +283,11 @@ const editBooking = (id: number) => {
 }
 
 const handleEditBooking = async (
-  bookingData: any,
+  bookingData: BookingsInterface,
 ) => {
   try {
     const apiData = {
       ...bookingData,
-      room_id: editBookingData.value.room_id,
       user_id: editBookingData.value.user_id
     }
     await putBookings(editBookingData.value.id, apiData)
@@ -266,7 +295,7 @@ const handleEditBooking = async (
     editDialog.value = false
   } catch (error) {
     console.error(error)
-    throw error
+    showError(error, 'editar reserva')
   }
 }
 
@@ -284,7 +313,7 @@ const confirmDelete = async () => {
       bookingTodelete.value = null
     } catch (error) {
       console.error(error)
-      throw error
+      showError(error, 'excluir reserva')
     }
   }
 }

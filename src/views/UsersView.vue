@@ -4,7 +4,9 @@
     <v-row>
       <v-col>
         <div class="mb-4">
-          <h1 class="text-h4 font-weight-bold text-primary mb-2">
+          <h1
+            class="text-h4 font-weight-bold text-primary mb-2"
+          >
             Gerenciamento de Usuários
           </h1>
           <p class="text-body-1 text-medium-emphasis">
@@ -23,8 +25,12 @@
         </div>
         <v-card class="mt-6" elevation="2">
           <v-card-title class="d-flex align-center pa-6">
-            <v-icon class="mr-3" color="primary">mdi-account-group</v-icon>
-            <span class="text-h5 font-weight-bold">Usuários Cadastrados</span>
+            <v-icon class="mr-3" color="primary"
+              >mdi-account-group</v-icon
+            >
+            <span class="text-h5 font-weight-bold"
+              >Usuários Cadastrados</span
+            >
           </v-card-title>
           <v-data-table
             class="border-pacit-100"
@@ -165,12 +171,20 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <ErrorComponent
+      v-model:isActive="errorDialog"
+      :errorMessage="errorMessage"
+      :status="errorStatus"
+      :text="errorText"
+    />
   </v-container>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import NavbarComponent from '@/components/NavbarComponent.vue'
+import ErrorComponent from '@/components/ErrorComponent.vue'
 
 import type { UserInterface } from '@/interface/users/usersInterface'
 import type { CreateUserInterface } from '@/interface/users/createUsersInterface'
@@ -205,6 +219,12 @@ const editErrors = ref<{
   [key: string]: string[]
 }>({})
 
+// Estados do ErrorComponent
+const errorDialog = ref(false)
+const errorMessage = ref('')
+const errorStatus = ref(0)
+const errorText = ref('')
+
 const headers = [
   { title: 'Nome Completo', key: 'name' },
   { title: 'E-mail', key: 'email' },
@@ -216,6 +236,13 @@ onMounted(() => {
   loadUsers()
 })
 
+const showError = (error: any, operation: string) => {
+  errorStatus.value = error.response?.status || 500
+  errorMessage.value = error.response?.data?.message || error.message || 'Erro desconhecido'
+  errorText.value = `Erro ao ${operation}`
+  errorDialog.value = true
+}
+
 const handleCreateUser = async (
   userData: CreateUserInterface,
 ) => {
@@ -225,7 +252,7 @@ const handleCreateUser = async (
     dialog.value = false
   } catch (error) {
     console.error(error)
-    throw error
+    showError(error, 'criar usuário')
   }
 }
 
@@ -235,7 +262,7 @@ const loadUsers = async () => {
     users.value = response
   } catch (error) {
     console.error(error)
-    throw error
+    showError(error, 'carregar usuários')
   }
 }
 
@@ -246,7 +273,7 @@ const editUser = (id: number) => {
       id: user.id,
       name: user.name,
       email: user.email,
-      password: user.password,
+      password: '',
       role: user.role,
     }
     editDialog.value = true
@@ -262,6 +289,7 @@ const handleEditUser = async (
     editDialog.value = false
   } catch (error) {
     console.error(error)
+    showError(error, 'editar usuário')
   }
 }
 
@@ -279,7 +307,7 @@ const confirmDelete = async () => {
       userToDelete.value = null
     } catch (error) {
       console.error(error)
-      throw error
+      showError(error, 'excluir usuário')
     }
   }
 }
