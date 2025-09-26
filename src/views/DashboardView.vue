@@ -128,9 +128,7 @@ import type { CreateBookingsInterface } from '../interface/bookings/createBookin
 import { DotsVerticalIcon, EditIcon, TrashIcon } from 'vue-tabler-icons'
 
 //import { getBookings } from '@/services/getBookings'
-import { useAuthStore } from '@/stores/authStore'
 
-const authStore = useAuthStore()
 const loading = shallowRef(false)
 
 const bookings = ref<BookingsInterface[]>([])
@@ -183,6 +181,7 @@ let item = [
   },
 
   {
+    id: 2,
     firstname: 'Leandro',
     lastname: 'Dias',
     checkin: '03/02/2025',
@@ -190,6 +189,7 @@ let item = [
   },
 
   {
+    id: 3,
     firstname: 'Jhon',
     lastname: 'Snow',
     checkin: '04/02/2025',
@@ -197,6 +197,7 @@ let item = [
   },
 
   {
+    id: 4,
     firstname: 'Leo',
     lastname: 'Dias',
     checkin: '02/02/2025',
@@ -204,6 +205,7 @@ let item = [
   },
 
   {
+    id: 5,
     firstname: 'Leandro',
     lastname: 'Dias',
     checkin: '03/02/2025',
@@ -211,6 +213,7 @@ let item = [
   },
 
   {
+    id: 6,
     firstname: 'Jhon',
     lastname: 'Snow',
     checkin: '04/02/2025',
@@ -218,6 +221,7 @@ let item = [
   },
 
   {
+    id: 7,
     firstname: 'Leo',
     lastname: 'Dias',
     checkin: '02/02/2025',
@@ -225,6 +229,7 @@ let item = [
   },
 
   {
+    id: 8,
     firstname: 'Leandro',
     lastname: 'Dias',
     checkin: '03/02/2025',
@@ -232,6 +237,7 @@ let item = [
   },
 
   {
+    id: 9,
     firstname: 'Jhon',
     lastname: 'Snow',
     checkin: '04/02/2025',
@@ -239,6 +245,7 @@ let item = [
   },
 
   {
+    id: 10,
     firstname: 'Leo',
     lastname: 'Dias',
     checkin: '02/02/2025',
@@ -246,6 +253,7 @@ let item = [
   },
 
   {
+    id: 11,
     firstname: 'Leandro',
     lastname: 'Dias',
     checkin: '03/02/2025',
@@ -253,6 +261,7 @@ let item = [
   },
 
   {
+    id: 12,
     firstname: 'Jhon',
     lastname: 'Snow',
     checkin: '04/02/2025',
@@ -260,6 +269,7 @@ let item = [
   },
 
   {
+    id: 13,
     firstname: 'Leo',
     lastname: 'Dias',
     checkin: '02/02/2025',
@@ -267,13 +277,16 @@ let item = [
   },
 
   {
+    id: 14,
     firstname: 'Leandro',
     lastname: 'Dias',
     checkin: '03/02/2025',
     checkout: '03/02/2025',
   },
 
+
   {
+    id: 15,
     firstname: 'Jhon',
     lastname: 'Snow',
     checkin: '04/02/2025',
@@ -300,7 +313,6 @@ const handleCreateBooking = async (bookingData: CreateBookingsInterface) => {
   try {
     // const apiData = {
     //   ...bookingData,
-    //   user_id: authStore.user.id,
     // }
     // await postBookings(apiData)
     // await loadBookings()
@@ -327,12 +339,6 @@ const editBooking = (id: number) => {
 
 const handleEditBooking = async (bookingData: BookingsInterface) => {
   try {
-    item = item.map((item) => {
-      return { ...item, ...novosDados }
-    })
-    const item = {
-      novosDados,
-    }
    // await putBookings(editBookingData.value.id, apiData)
    // await loadBookings()
     editDialog.value = false

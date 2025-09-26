@@ -36,7 +36,7 @@
         >
           <v-text-field
             v-model="firstname"
-            :error-messages="errors.name"
+            :error-messages="errors.firstname"
             label="Primeiro Nome"
             variant="outlined"
             prepend-inner-icon="mdi-text"
@@ -47,7 +47,7 @@
 
           <v-text-field
             v-model="lastname"
-            :error-messages="errors.dateInit"
+            :error-messages="errors.lastname"
             label="Sobrenome"
             variant="outlined"
             prepend-inner-icon="mdi-text"
@@ -58,7 +58,7 @@
 
           <v-text-field
             v-model="checkin"
-            :error-messages="errors.dateEnd"
+            :error-messages="errors.checkin"
             label="Checkin"
             variant="outlined"
             prepend-inner-icon="mdi-calendar-start"
@@ -70,7 +70,6 @@
 
           <v-text-field
             v-model="checkout"
-            :error-messages="errors.dateEnd"
             label="Checkout"
             variant="outlined"
             prepend-inner-icon="mdi-calendar-end"
